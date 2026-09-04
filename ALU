@@ -1,0 +1,35 @@
+module ALU(
+    input logic [31:0] a,b,
+    input logic [2:0] alu_control,
+    output logic [31:0] alu_result,
+    output logic zero);
+    always @(*) begin
+        case (alu_control)
+            // ADD
+            3'b000:
+                alu_result = a + b;
+            // SUB
+            3'b001:
+                alu_result = a - b;
+            // AND
+            3'b010:
+                alu_result = a & b;
+            // OR
+            3'b011:
+                alu_result = a | b;
+            // XOR
+            3'b100:
+                alu_result = a ^ b;
+            // NOR
+            3'b101:
+                alu_result = ~(a | b);
+            // SLT
+            3'b110:
+                alu_result =
+                    ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
+            default:
+                alu_result = 32'b0;
+        endcase
+    end
+    assign zero = (alu_result == 32'b0);
+endmodule
