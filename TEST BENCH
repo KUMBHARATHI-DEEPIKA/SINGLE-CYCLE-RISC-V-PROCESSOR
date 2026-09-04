@@ -1,0 +1,68 @@
+//testbench
+module testbench;
+    logic clk;
+    logic rst;
+    riscv_single_cycle dut(.clk(clk),.rst(rst));
+    always #5 clk = ~clk;
+    
+    always @(posedge clk) begin
+        #1;
+        $display(
+            "TIME=%0t | PC=%08h | INSTR=%08h | REGWRITE=%b | ALU=%08h",$time,dut.pc,dut.instr,dut.reg_write,dut.alu_result);
+    end
+    initial begin
+        clk = 1'b0;
+        rst = 1'b1;
+        $dumpfile("riscv.vcd");
+        $dumpvars(0, testbench);
+        $display("SINGLE-CYCLE RISC-V TEST");
+        
+        #12;
+        rst = 1'b0; #100;
+        $display("REGISTER RESULTS");
+        if (dut.dp.rf.rf[1] === 32'h00000005)
+            $display("PASS: x1 = %08h", dut.dp.rf.rf[1]);
+        else
+            $display("FAIL: x1 = %08h | Expected = 00000005",
+                     dut.dp.rf.rf[1]);
+        if (dut.dp.rf.rf[2] === 32'h0000000A)
+            $display("PASS: x2 = %08h", dut.dp.rf.rf[2]);
+        else
+            $display("FAIL: x2 = %08h | Expected = 0000000A",
+                     dut.dp.rf.rf[2]);
+        if (dut.dp.rf.rf[3] === 32'h0000000F)
+            $display("PASS: x3 = %08h", dut.dp.rf.rf[3]);
+        else
+            $display("FAIL: x3 = %08h | Expected = 0000000F",
+                     dut.dp.rf.rf[3]);
+        if (dut.dp.rf.rf[4] === 32'hFFFFFFFB)
+            $display("PASS: x4 = %08h", dut.dp.rf.rf[4]);
+        else
+            $display("FAIL: x4 = %08h | Expected = FFFFFFFB",
+                     dut.dp.rf.rf[4]);
+        if (dut.dp.rf.rf[5] === 32'h00000000)
+            $display("PASS: x5 = %08h", dut.dp.rf.rf[5]);
+        else
+            $display("FAIL: x5 = %08h | Expected = 00000000",
+                     dut.dp.rf.rf[5]);
+        if (dut.dp.rf.rf[6] === 32'h0000000F)
+            $display("PASS: x6 = %08h", dut.dp.rf.rf[6]);
+        else
+            $display("FAIL: x6 = %08h | Expected = 0000000F",
+                     dut.dp.rf.rf[6]);
+        if (dut.dp.rf.rf[7] === 32'h0000000F)
+            $display("PASS: x7 = %08h", dut.dp.rf.rf[7]);
+        else
+            $display("FAIL: x7 = %08h | Expected = 0000000F",
+                     dut.dp.rf.rf[7]);
+        if (dut.dmem.RAM[0] === 32'h0000000F)
+            $display("PASS: MEM[0] = %08h", dut.dmem.RAM[0]);
+        else
+            $display("FAIL: MEM[0] = %08h | Expected = 0000000F",
+                     dut.dmem.RAM[0]);
+        $display("TEST COMPLETE");
+        
+        $finish;
+    end
+endmodule
+
