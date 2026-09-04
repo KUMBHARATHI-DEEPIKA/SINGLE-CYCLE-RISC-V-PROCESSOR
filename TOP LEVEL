@@ -1,0 +1,18 @@
+module riscv_single_cycle(input logic clk,rst);
+    // Signals
+    logic [31:0] pc,instr;
+    logic [31:0] alu_result,write_data,read_data;
+    logic zero;
+    logic [1:0] result_src;
+    logic mem_write,branch,alu_src,reg_write,jump;
+    logic [1:0] imm_src;
+    logic [2:0] alu_control;
+    // INSTRUCTION MEMORY
+    Ins_mem imem(.a(pc),.rd(instr));
+    // CONTROLLER
+    controller ctrl(.op(instr[6:0]),.funct3(instr[14:12]),.funct7b5(instr[30]),.result_src(result_src),.mem_write(mem_write),.branch(branch),.alu_src(alu_src),.reg_write(reg_write),.jump(jump),.imm_src(imm_src),.alu_control(alu_control));
+    // DATAPATH
+    datapath dp(.clk(clk),.rst(rst),.result_src(result_src),.mem_write(mem_write),.branch(branch),.alu_src(alu_src),.reg_write(reg_write),.jump(jump),.imm_src(imm_src),.alu_control(alu_control),.instr(instr),.read_data(read_data),.pc(pc),.alu_result(alu_result),.write_data(write_data),.zero(zero));
+    // DATA MEMORY
+    data_mem dmem(.clk(clk),.we(mem_write),.a(alu_result),.wd(write_data),.rd(read_data));
+endmodule
