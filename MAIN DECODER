@@ -1,0 +1,74 @@
+module main_decoder(
+    input logic [6:0] op,
+    output logic [1:0] result_src,
+    output logic mem_write, branch,alu_src,reg_write,jump,
+    output logic [1:0] imm_src,alu_op);
+
+    always @(*) begin
+        // Defaults
+        result_src = 2'b00;
+        mem_write  = 1'b0;
+        branch     = 1'b0;
+        alu_src    = 1'b0;
+        reg_write  = 1'b0;
+        jump       = 1'b0;
+        imm_src    = 2'b00;
+        alu_op     = 2'b00;
+
+        case (op)
+            // R-TYPE
+            7'b0110011: begin
+                reg_write = 1'b1;
+                alu_src   = 1'b0;
+                alu_op    = 2'b10;
+            end
+            // I-TYPE ALU
+            7'b0010011: begin
+                reg_write = 1'b1;
+                alu_src   = 1'b1;
+                imm_src   = 2'b00;
+                alu_op    = 2'b10;
+            end
+            // LOAD WORD
+            7'b0000011: begin
+                reg_write  = 1'b1;
+                alu_src    = 1'b1;
+                result_src = 2'b01;
+                imm_src    = 2'b00;
+                alu_op     = 2'b00;
+            end
+            // STORE WORD
+            7'b0100011: begin
+                mem_write = 1'b1;
+                alu_src   = 1'b1;
+                imm_src   = 2'b01;
+                alu_op    = 2'b00;
+            end
+            // BRANCH EQUAL
+            7'b1100011: begin
+                branch  = 1'b1;
+                alu_src = 1'b0;
+                imm_src = 2'b10;
+                alu_op  = 2'b01;
+            end
+            // JUMP AND LINK
+            7'b1101111: begin
+                reg_write  = 1'b1;
+                jump       = 1'b1;
+                result_src = 2'b10;
+                imm_src    = 2'b11;
+                alu_op     = 2'b00;
+            end
+            default: begin
+                result_src = 2'b00;
+                mem_write  = 1'b0;
+                branch     = 1'b0;
+                alu_src    = 1'b0;
+                reg_write  = 1'b0;
+                jump       = 1'b0;
+                imm_src    = 2'b00;
+                alu_op     = 2'b00;
+            end
+        endcase
+    end
+endmodule
